@@ -4,17 +4,41 @@ require 'minitest/pride'
 
 
 class Five
-  @vowels = ["a", "e", "i", "o", "u"]
+  def initialize
+    @vowels = ["a", "e", "i", "o", "u"]
+    @bads = ["ab", "cd", "pq", "xy"]
+  end
+
   def vowels?(str)
-    arr = str.split("")
-    if
+    vowels = 0
+    @vowels.each { |vowel| vowels += str.count(vowel) }
+    return (vowels >= 3) ? true : false
+  end
+
+  def doubles?(str)
+    doubles = 0
+    str.split("").each_with_index { |letter, index| doubles += (str[index] == str[index + 1]) ? 1 : 0 }
+    return (doubles > 0) ? true : false
+  end
+
+  def no_bad?(str)
+    bads = 0
+    @bads.each { |bad| bads += str.include?(bad) ? 1 : 0 }
+    return (bads == 0) ? true : false
+  end
 
   def is_nice?(str)
-    if (vowels?(str) and doubles?(str) and no_bad?(str))
+    if (vowels?(str) && doubles?(str) && no_bad?(str))
       return 1
     else
       return 0
     end
+  end
+
+  def multi_is_nice(str)
+    total_nice = 0
+    str.split("\n").each { |line| total_nice += is_nice?(line) }
+    return total_nice
   end
 end
 
@@ -24,33 +48,32 @@ class TestFive < Minitest::Test
   end
 
   def test_one
-    skip
+    # skip
     assert_equal 1, @five.is_nice?("ugknbfddgicrmopn")
   end
 
   def test_two
-    skip
+    # skip
     assert_equal 1, @five.is_nice?("aaa")
   end
 
   def test_three
-    skip
+    # skip
     assert_equal 0, @five.is_nice?("jchzalrnumimnmhp")
   end
 
   def test_four
-    skip
+    # skip
     assert_equal 0, @five.is_nice?("haegwjzuvuyypxyu")
   end
 
   def test_four
-    skip
+    # skip
     assert_equal 0, @five.is_nice?("dvszwmarrgswjxmb")
   end
 end
 
 @run = Five.new
-# p @run.getHash("ckczppom")
 @input = %q(zgsnvdmlfuplrubt
 vlhagaovgqjmgvwq
 ffumlmqwfcsyqpss
@@ -1051,3 +1074,5 @@ sztzziuqroeidcus
 pxdfvcpvwaddrzwv
 phdqqxleqdjfgfbg
 cqfikbgxvjmnfncy)
+
+puts @run.multi_is_nice(@input)
