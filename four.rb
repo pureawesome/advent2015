@@ -9,7 +9,7 @@ class Four
     md5 = Digest::MD5.new
     md5.hexdigest
 
-    while count
+    while (count)
       md5.reset
       md5.update "#{str}#{count}"
       break if md5.to_s.slice(0, 6) == '000000'
@@ -26,14 +26,14 @@ class TestFour < Minitest::Test
 
   def test_one
     # skip
-    assert_equal 609_043, @four.getHash('abcdef')
+    assert_equal 609043, @four.getHash("abcdef")
   end
 
   def test_two
     # skip
-    assert_equal 1_048_970, @four.getHash('pqrstuv')
+    assert_equal 1048970, @four.getHash("pqrstuv")
   end
 end
 
 @run = Four.new
-p @run.getHash('iwrupvqb')
+p @run.getHash("ckczppom")
