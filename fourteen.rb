@@ -7,28 +7,37 @@ class Reindeer
     @speed = speed
     @speedtime = speedtime
     @rest = rest
-    @state = 1
+    @state = 0
   end
 
   def spot_in_time(time)
-    localtime = dist = localcounter = 0
-    while localtime <= time
-      if @state == 1 && localcounter == @speedtime
-        @state = 0
-        localcounter = 0
-      end
-
-      if @state == 0 && localcounter == @rest
+    bulk_jumps = 1
+    dist = 0
+    while bulk_jumps == 1
+      if @state == 0 && time > @speedtime
+        dist += @speed * @speedtime
+        time -= @speedtime
         @state = 1
-        localcounter = 0
+      elsif @state == 1 && time > @rest
+        time -= @rest
+        @state = 0
+      else
+        dist += @speed * time if @state == 0
+        bulk_jumps = 0
       end
-
-      dist += @speed if @state == 1
-      localcounter += 1
-      localtime += 1
     end
+    @state = 0
     dist
   end
+end
+
+def points(time, items)
+  points = items.map { 0 }
+  time.times do |index|
+    disters = items.map { |item| item.spot_in_time(index + 1) }
+    disters.each.with_index { |num, spot| points[spot] += 1 if num == disters.max }
+  end
+  points
 end
 
 reindeers = []
@@ -45,7 +54,8 @@ file.each do |item|
 end
 
 at_time = reindeers.map { |name| name.spot_in_time(2503) }
-p at_time.max
+p 'question one is ' + at_time.max.to_s
+p points(2503, reindeers).max
 
 class TestFourteen < Minitest::Test
   def setup
@@ -59,5 +69,9 @@ class TestFourteen < Minitest::Test
 
   def test_two
     assert_equal 1120, @comet.spot_in_time(1000)
+  end
+
+  def test_three
+    assert_equal [689, 312], points(1000, [@dancer, @comet])
   end
 end
