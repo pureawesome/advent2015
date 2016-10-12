@@ -1,25 +1,17 @@
 require 'minitest/autorun'
 require 'minitest/pride'
 
-file = File.readlines('thirteen.txt')
-word_index = [0, 2, 3, 10]
+file = File.readlines('thirteen_test.txt')
 guests = []
 combos = {}
 totals = []
-arr = file.map do |item|
-  item.split(' ').select.with_index do |word, index|
-    word_index.include?(index) ? word : nil
-  end
-end
-arr.map do |line|
+
+file.each do |item|
+  line = item.delete('.').split(' ')
+  names = line[0] + line[10]
+  diff = line[2] == 'lose' ? -line[3].to_i : line[3].to_i
+  combos[names] = diff
   guests.push(line[0]) unless guests.include?(line[0])
-  line[2] = line[2].to_i
-  line[2] = -line[2] if line[1] == 'lose'
-  line[3] = line[3].delete('.')
-  line.delete_at(1)
-  keyer = line[0] + line[2]
-  value = line[1]
-  combos[keyer] = value
 end
 
 guests_iters = guests.permutation.to_a
@@ -35,8 +27,4 @@ guests_iters.map do |order|
   totals.push(total)
 end
 
-# p arr
-# p guests
-# p combos
-# p guests_iters
 p totals.max
