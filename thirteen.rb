@@ -1,7 +1,7 @@
 require 'minitest/autorun'
 require 'minitest/pride'
 
-file = File.readlines('thirteen_test.txt')
+file = File.readlines('thirteen.txt')
 guests = []
 combos = {}
 totals = []
@@ -13,6 +13,15 @@ file.each do |item|
   combos[names] = diff
   guests.push(line[0]) unless guests.include?(line[0])
 end
+
+# Part 2
+me = 'Me'
+guests.each do |guest|
+  combos[me + guest] = 0
+  combos[guest + me] = 0
+end
+guests.push(me)
+# End Part 2
 
 guests_iters = guests.permutation.to_a
 
