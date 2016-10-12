@@ -26,7 +26,16 @@ data = {
 
 
 matches = data.map do |key, value|
-  sues.map { |sue| sue.keys if sue.values[0][key] == value }.compact.flatten
+  # part 1
+  # sues.map { |sue| sue.keys if sue.values[0][key] == value }.compact.flatten
+
+  # part 2
+  check = '=='.to_sym
+  check = '>'.to_sym if key == :cats || key == :trees
+  check = '<'.to_sym if key == :pomeranians || key == :goldfish
+  sues.map do |sue|
+    sue.keys if !sue.values[0][key].nil? && sue.values[0][key].send(check, value)
+  end.compact.flatten
 end
 
 p matches.flatten.group_by(&:itself).values.max_by(&:size).first
