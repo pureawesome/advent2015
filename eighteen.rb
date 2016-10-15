@@ -36,11 +36,18 @@ def update_state(state, neighbors)
   end
 end
 
+def get_corners
+  [0, @side - 1].repeated_permutation(2).to_a
+                .map { |coord| coord_to_index(coord[0], coord[1]) }
+end
+
 def run_test_animation
+  corners = get_corners
   @side.times do
     new_grid = @grid.map.with_index do |light, index|
       coord = index_to_coord(index)
       total = get_neighbors(coord[0], coord[1]).map { |arr| @grid[coord_to_index(arr[0], arr[1])] }.inject(:+)
+      total = 2 if corners.include? index
       update_state(light, total)
     end
     @grid = new_grid
