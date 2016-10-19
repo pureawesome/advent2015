@@ -22,51 +22,30 @@ end
 
 # p patterns.uniq.size
 
-@molecule = 'HOHOHO'
+@molecule = 'CRnCaCaCaSiRnBPTiMgArSiRnSiRnMgArSiRnCaFArTiTiBSiThFYCaFArCaCaSiThCaPBSiThSiThCaCaPTiRnPBSiThRnFArArCaCaSiThCaSiThSiRnMgArCaPTiBPRnFArSiThCaSiRnFArBCaSiRnCaPRnFArPMgYCaFArCaPTiTiTiBPBSiThCaPTiBPBSiRnFArBPBSiRnCaFArBPRnSiRnFArRnSiRnBFArCaFArCaCaCaSiThSiThCaCaPBPTiTiRnFArCaPTiBSiAlArPBCaCaCaCaCaSiRnMgArCaSiThFArThCaSiThCaSiRnCaFYCaSiRnFYFArFArCaSiRnFYFArCaSiRnBPMgArSiThPRnFArCaSiRnFArTiRnSiRnFYFArCaSiRnBFArCaSiRnTiMgArSiThCaSiThCaFArPRnFArSiRnFArTiTiTiTiBCaCaSiRnCaCaFYFArSiThCaPTiBPTiBCaSiThSiRnMgArCaF'
+# @molecule = 'HOHOHO'
 part2 = 'e'
-combo2 = File.readlines('nineteen_test.txt').map(&:strip).map do |combo|
-  combo.split(' => ')
+part2_mol = @molecule.dup
+kvs = Hash.new { |h, k| h[k] = [] }
+File.readlines('nineteen.txt').map(&:strip).map do |combo|
+  combo = combo.split(' => ')
+  kvs[combo[1]] = combo[0]
 end
-
-patterns2 = [part2]
+kvs = kvs.sort_by { |k, _v| k.size }.reverse
 steps = 0
 
-until patterns2.include? @molecule
-  patterns2 = patterns2.map do |pattern|
-    new_outputs = []
-    combo2.each do |combo|
-      next unless pattern =~ /#{combo[0]}/
+until part2_mol == part2
+  break if steps >= 1000
 
-      indexes = []
-      pattern.scan /#{combo[0]}/ do |i|
-        indexes << $~.offset(0)[0]
-      end
-
-      indexes = indexes.map do |index|
-        dup = pattern.dup
-        dup[index...(index + combo[0].size)] = combo[1]
-        dup
-      end
-      new_outputs << indexes
+  kvs.each do |k, v|
+    next unless part2_mol =~ /#{k}/
+    count = 0
+    part2_mol.scan(/#{k}/) do
+      count += 1
     end
-    new_outputs
-  end.flatten.uniq
 
-  steps += 1
+    part2_mol.gsub!(/#{k}/, v)
+    steps += count
+  end
 end
 p steps
-
-  # next unless @molecule =~ /#{combo[0]}/
-  # indexes = []
-  #
-  # @molecule.scan /#{combo[0]}/ do |i|
-  #   indexes << $~.offset(0)[0]
-  # end
-  # total_indexes += indexes.size
-  #
-  # indexes.map do |index|
-  #   molecule_copy = @molecule
-  #   molecule_copy[index...(index + combo[0].size)] = combo[1]
-  #   patterns << molecule_copy
-  # end
-# end
