@@ -1,18 +1,10 @@
 @boss = {
-  hp: 51,
-  d: 9
+  hp: 51, d: 9
 }
 
 @you = {
-  hp: 50,
-  mana: 500,
-  armor: 0,
-  shield: 0,
-  poison: 0,
-  recharge: 0
+  hp: 50, mana: 500, armor: 0, shield: 0, poison: 0, recharge: 0
 }
-
-@options = [:missle, :drain, :shield, :poison, :recharge]
 
 # @spells = {
 #   missle: { cost: 53, d: 4 },
@@ -23,11 +15,7 @@
 # }
 
 @spells = {
-  missle: 53,
-  drain: 73,
-  shield: 113,
-  poison: 173,
-  recharge: 229
+  missle: 53, drain: 73, shield: 113, poison: 173, recharge: 229
 }
 
 def fight
@@ -36,34 +24,40 @@ def fight
   @attack = 'player'
   @history = 0
 
-  turn while @enemy[:hp] > 0 && @player[:hp] > 0 && @player[:mana] > 0
-  @scores.push(@history) if @enemy[:hp] <= 0
+  turn while !gameover?
+  @scores.push(@history) if @enemy[:hp] <= 0 && @player[:hp] > 0
+end
+
+def gameover?
+  @enemy[:hp] <= 0 || @player[:hp] <= 0 || available_spells.empty?
 end
 
 def turn
   if @attack == 'player'
-    # part 2
+    # # part 2
     @player[:hp] -= 1
-    return if @player[:hp] <= 0
+    return if gameover?
 
     check_status
+    return if gameover?
+
     player_attack
     @attack = 'boss'
   else
     check_status
-    return if @enemy[:hp] < 1
-    @player[:hp] -= (@enemy[:d] - @player[:armor])
+    return if gameover?
+    @player[:hp] -= [@enemy[:d] - @player[:armor], 1].max
     @attack = 'player'
   end
 end
 
 def check_status
+  @player[:armor] = 0 if @player[:shield] == 0
+
   if @player[:shield] > 0
     @player[:armor] = 7
     @player[:shield] -= 1
   end
-
-  @player[:armor] = 0 if @player[:shield] == 0
 
   if @player[:poison] > 0
     @enemy[:hp] -= 3
@@ -76,10 +70,14 @@ def check_status
   end
 end
 
+def available_spells
+  @spells.select { |_k, v| @player[:mana] >= v }.keys
+end
+
 def player_attack
-  available = @spells.select { |_k, v| @player[:mana] >= v }.keys.sample
-  return if available.nil?
-  spell = 'cast_' + available.to_s
+  available = available_spells
+  return if available.empty?
+  spell = 'cast_' + available.sample.to_s
   send(spell.to_sym)
 end
 
@@ -90,7 +88,7 @@ def cast_missle
 end
 
 def cast_drain
-  @enemy[:hp] -= 1
+  @enemy[:hp] -= 2
   @player[:mana] -= 73
   @player[:hp] += 2
   @history += 73
@@ -115,8 +113,7 @@ def cast_recharge
 end
 
 @scores = []
-1_000_000.times do |_i|
+100_000.times do |_i|
   fight
 end
-
-p @scores.min if @scores
+p @scores.min
